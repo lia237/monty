@@ -1,88 +1,66 @@
 #include "monty.h"
 
-/**
-* main - exec Monty code
-* @argc: number of command arguments
-* @argv: vector of command arguments
-* Return: EXIT_SUCCESS on success, EXIT_FAILURE on fail
-*/
-int main(int argc, char *argv[])
-{
-	if (argc != 2)
-	{
-		fprintf(stderr, "USAGE: monty file\n");
-		exit(EXIT_FAILURE);
-	}
-	create_buff(argv[1]);
-	fclose(argument_container.file);
-	return (EXIT_SUCCESS);
-}
 
 /**
-* free_stack - frees memory in the stack
-* @head: the first node
-*/
-void free_stack(stack_t **head)
+ * handle_instruction - check the instruction.
+ * @instruction: the instruction line.
+ * Return: 0 when it fails 1 on success.
+ */
+int handle_instruction(char *instruction)
 {
-	stack_t *temp;
-
-	if (!head)
-		return;
-	free(argument_container.input);
-	while (*head != NULL)
-	{
-		temp = (*head)->next;
-		free(*head);
-		*head = temp;
-	}
-}
-
-/**
-* get_opcode - gets the correct function
-* @stack: the stack
-* @line_number: the line_number
-* @command: the command being searched for
-*/
-void get_opcode(stack_t **stack, unsigned int line_number, char *command)
-{
-	int index = 0;
-	instruction_t codes[] = {
-		{"push", op_push},
-		{"pall", op_pall},
-		{"pint", op_pint},
-		{"pop", op_pop},
-		{"swap", op_swap},
-		{"add", op_add},
-		{"sub", op_sub},
-		{"div", op_sub},
-		{"mul", op_mul},
-		{"nop", op_nop},
-		{"mod", op_mod},
-		{"\0", NULL}
+	char *inst_name;
+	/* char *arg; */
+	int i = 0;
+	instruction_t ins_func[] = {
+		{"push", NULL}, {NULL, NULL}
 	};
 
-	if (command[0] == '#')
-		return;
-	if (strcmp(command, "queue") == 0)
+	inst_name = strtok(instruction, " \n\t");
+	if ((inst_name && inst_name[0] == '#') || !inst_name)
+		return (0);
+	/* arg = strtok(NULL, " \n\t"); */
+	while (ins_func[i].opcode != NULL)
 	{
-		argument_container.stack_queue = 0;
-		return;
-	}
-	if (strcmp(command, "stack") == 0)
-	{
-		argument_container.stack_queue = 1;
-		return;
-	}
-	while (codes[index].opcode != NULL)
-	{
-		if (strcmp(codes[index].opcode, command) == 0)
+		if (strcmp(inst_name, ins_func[i].opcode) == 0)
 		{
-			codes[index].f(stack, line_number);
-			return;
 		}
-		index++;
+		i++;
 	}
-	printf("L%d: unknown instruction %s\n", line_number, command);
-	free_stack(stack);
-	exit(EXIT_FAILURE);
+	return (1);
+}
+
+/**
+ * main - Entry point.
+ * @argc: number of command line arguments.
+ * @argv: the command line arguments.
+ * Return: Always 0.
+ */
+int main(int argc, char **argv)
+{
+	FILE *file;
+	char *instruction;
+	size_t read_l = 1;
+	size_t size = 0;
+
+	if (argc != 2)
+	{
+		write(STDERR_FILENO, "USAGE: monty file\n", 18);
+		exit(EXIT_FAILURE);
+	}
+	file = fopen(argv[1], "r");
+	if (!file)
+	{
+		fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
+		exit(EXIT_FAILURE);
+	}
+	while (read_l > 0)
+	{
+		instruction = NULL;
+		read_l = getline(&instruction, &size, file);
+		if (read_l)
+			handle_instruction(instruction);
+		free(instruction);
+	}
+	fclose(file);
+	return (0);
 }
