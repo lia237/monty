@@ -1,25 +1,20 @@
 #include "monty.h"
-
 /**
- * op_pall - prints out the stack
- * @stack: pointer to the stack
- * @line_number: line number in the file
- */
-
+* op_pall - prints out the stack
+* @stack: the stack
+* @line_number: the line
+*/
 void op_pall(stack_t **stack, unsigned int line_number)
 {
-    stack_t *current_node;
+	stack_t *temp;
 
-    (void)line_number;
-    
-    if (!*stack)
-        return;
-    
-    current_node = *stack;
-    while (current_node != NULL)
-    {
-        printf("%d\n", current_node->n);
-        current_node = current_node->next;
-    }
+	(void)line_number;
+	if (!*stack)
+		return;
+	temp = *stack;
+	while (temp != NULL)
+	{
+		printf("%d\n", temp->n);
+		temp = temp->next;
+	}
 }
-
