@@ -1,11 +1,11 @@
 #include "monty.h"
 
-void print_all_stack(stack_t **stack_top, unsigned int line_number)
+void f_pall(stack_t **stack_head, unsigned int line_number)
 {
     stack_t *current;
     (void) line_number;
 
-    current = *stack_top;
+    current = *stack_head;
     if (current == NULL)
         return;
 
